@@ -27,6 +27,7 @@ jobs:
       - run: npm run check:public
       - run: npm audit --omit=dev --audit-level=high
       - run: npm run build
+      - run: npm run check:deploy
 
   deploy:
     needs: check

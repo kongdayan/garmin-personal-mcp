@@ -27,7 +27,9 @@ export function deploymentConfig(base, env) {
   if (!["cn", "global"].includes(region)) throw new Error("GARMIN_REGION must be cn or global.");
   if (!/^[1-9]\d{0,8}$/.test(authVersion)) throw new Error("AUTH_VERSION must be a positive integer, up to 9 digits.");
   if (!["true", "false"].includes(staticToken)) throw new Error("ENABLE_STATIC_TOKEN must be true or false.");
-  return { ...base, name, account_id: account, main: "../src/index.ts", tsconfig: "../tsconfig.json",
+  // Let esbuild discover tsconfig next to the source. Wrangler resolves explicit
+  // tsconfig paths differently from main when a generated config lives in .deploy.
+  return { ...base, name, account_id: account, main: "../src/index.ts",
     kv_namespaces: [{ binding: "OAUTH_KV", id: kv }],
     vars: { GARMIN_REGION: region, PUBLIC_ORIGIN: origin.origin, AUTH_VERSION: authVersion, ENABLE_STATIC_TOKEN: staticToken },
   };

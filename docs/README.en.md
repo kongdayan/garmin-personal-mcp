@@ -63,6 +63,7 @@ npm test
 npm run test:scripts
 npm run check:public
 npm run build
+npm run check:deploy
 ```
 
 The checked-in Wrangler config is a development template. Use `npm run deploy` with the documented environment variables, not a direct production deployment of the placeholder config. `npm run verify:remote -- https://YOUR-WORKER...workers.dev` checks public discovery only, without health reads.

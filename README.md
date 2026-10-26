@@ -100,6 +100,7 @@ npm test
 npm run test:scripts
 npm run check:public
 npm run build
+npm run check:deploy
 ```
 
 复制 `.dev.vars.example` 为忽略的 `.dev.vars`，自行填入本地配置，然后 `npm run dev`。首页可在 localhost 预览；完整 OAuth 流程需要 HTTPS 和合法回调地址，自动测试使用合成凭据覆盖它。
