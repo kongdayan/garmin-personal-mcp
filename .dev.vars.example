@@ -1,0 +1,6 @@
+# Replace locally; this file is an example, not a working credential.
+# Optional static Bearer access is OFF by default. To enable locally, set
+# ENABLE_STATIC_TOKEN in a private Wrangler config and provide a separate token.
+# MCP_ACCESS_TOKEN=your-independent-random-token
+GARMIN_PERSONAL_API_KEY=replace-with-your-own-garmin-personal-key
+OWNER_LOGIN_KEY=replace-with-a-separate-random-owner-login-key

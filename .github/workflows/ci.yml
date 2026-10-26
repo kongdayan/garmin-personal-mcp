@@ -1,0 +1,70 @@
+name: Check and deploy
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run types && npm run check
+      - run: npm test
+      - run: npm run test:scripts
+      - run: npm run check:public
+      - run: npm audit --omit=dev --audit-level=high
+      - run: npm run build
+
+  deploy:
+    needs: check
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && vars.DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    concurrency:
+      group: production-worker
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      # Secrets are provided only to the deployment step, never to PR jobs or npm ci.
+      - name: Deploy code and secrets together
+        run: npm run deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          WORKER_NAME: ${{ vars.WORKER_NAME }}
+          PUBLIC_ORIGIN: ${{ vars.PUBLIC_ORIGIN }}
+          OAUTH_KV_ID: ${{ vars.OAUTH_KV_ID }}
+          GARMIN_REGION: ${{ vars.GARMIN_REGION }}
+          AUTH_VERSION: ${{ vars.AUTH_VERSION }}
+          ENABLE_STATIC_TOKEN: ${{ vars.ENABLE_STATIC_TOKEN }}
+          GARMIN_PERSONAL_API_KEY: ${{ secrets.GARMIN_PERSONAL_API_KEY }}
+          OWNER_LOGIN_KEY: ${{ secrets.OWNER_LOGIN_KEY }}
+          MCP_ACCESS_TOKEN: ${{ secrets.MCP_ACCESS_TOKEN }}
+      - name: Verify public discovery (no health reads)
+        run: npm run verify:remote
+        env:
+          PUBLIC_ORIGIN: ${{ vars.PUBLIC_ORIGIN }}
+      - name: Remove temporary credentials
+        if: always()
+        run: node -e "require('node:fs').rmSync('.deploy/secrets.json', {force:true})"

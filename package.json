@@ -1,0 +1,47 @@
+{
+  "name": "garmin-personal-mcp",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "types": "wrangler types --strict-vars false",
+    "check": "tsc --noEmit",
+    "test": "vitest run",
+    "build": "wrangler deploy --dry-run --outdir dist",
+    "deploy": "node scripts/deploy.mjs",
+    "configure": "node scripts/configure.mjs",
+    "verify:remote": "node scripts/verify-remote.mjs",
+    "test:scripts": "node --test scripts/*.test.mjs",
+    "check:public": "node scripts/check-public.mjs"
+  },
+  "dependencies": {
+    "@cloudflare/workers-oauth-provider": "1.2.4",
+    "@modelcontextprotocol/server": "2.3.1",
+    "agents": "0.30.0",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-plugin": "1.4.7",
+    "@cloudflare/workers-types": "5.20261026.1",
+    "@types/node": "26.6.5",
+    "typescript": "7.0.2",
+    "vitest": "5.0.5",
+    "wrangler": "4.152.0"
+  },
+  "description": "Self-hosted, read-only Garmin Personal API MCP for ChatGPT on Cloudflare Workers",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kongdayan/garmin-personal-mcp.git"
+  },
+  "overrides": {
+    "@cloudflare/vitest-plugin": {
+      "zod": "4.6.7"
+    },
+    "undici": "7.30.1"
+  }
+}
